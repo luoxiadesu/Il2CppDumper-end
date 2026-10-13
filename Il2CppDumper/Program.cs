@@ -210,7 +210,7 @@ namespace Il2CppDumper
                 var flag = il2Cpp.PlusSearch(metadata.methodDefs.Count(x => x.methodIndex >= 0), metadata.typeDefs.Length, metadata.imageDefs.Length);
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    if (!flag && il2Cpp is PE)
+                    if (!flag && il2Cpp is PE && config.AllowPELoader)
                     {
                         Console.WriteLine("Use custom PE loader");
                         il2Cpp = PELoader.Load(il2cppPath);

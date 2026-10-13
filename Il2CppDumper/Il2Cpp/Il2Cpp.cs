@@ -48,6 +48,20 @@ namespace Il2CppDumper
             this.metadataUsagesCount = metadataUsagesCount;
         }
 
+        // Large games can legitimately exceed the count limit; on PE also require the value to map into a section
+        private bool LooksLikePointer(ulong value, uint limit)
+        {
+            if (value <= limit)
+            {
+                return false;
+            }
+            if (this is PE)
+            {
+                return MapVATR(value) != 0;
+            }
+            return true;
+        }
+
         protected bool AutoPlusInit(ulong codeRegistration, ulong metadataRegistration)
         {
             if (codeRegistration != 0)
@@ -58,7 +72,7 @@ namespace Il2CppDumper
                     pCodeRegistration = MapVATR<Il2CppCodeRegistration>(codeRegistration);
                     if (Version == 31)
                     {
-                        if (pCodeRegistration.genericMethodPointersCount > limit)
+                        if (LooksLikePointer(pCodeRegistration.genericMethodPointersCount, limit))
                         {
                             codeRegistration -= PointerSize * 2;
                         }
@@ -70,7 +84,7 @@ namespace Il2CppDumper
                     }
                     if (Version == 29)
                     {
-                        if (pCodeRegistration.genericMethodPointersCount > limit)
+                        if (LooksLikePointer(pCodeRegistration.genericMethodPointersCount, limit))
                         {
                             Version = 29.1;
                             codeRegistration -= PointerSize * 2;

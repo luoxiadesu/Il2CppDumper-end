@@ -203,6 +203,8 @@ namespace Il2CppDumper
         public int interfacesStart;
         public int vtableStart;
         public int interfaceOffsetsStart;
+        [HGExtra]
+        public int hgExtra;
 
         public ushort method_count;
         public ushort property_count;

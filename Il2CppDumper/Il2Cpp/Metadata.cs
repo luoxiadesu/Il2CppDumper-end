@@ -93,6 +93,14 @@ namespace Il2CppDumper
             {
                 Version = 24.1;
             }
+            // Hypergryph layout: Il2CppTypeDefinition carries one extra int32 after interfaceOffsetsStart
+            var typeCount = imageDefs.Sum(x => (long)x.typeCount);
+            var typeDefSize = SizeOf(typeof(Il2CppTypeDefinition));
+            if (typeCount > 0 && header.typeDefinitionsSize != typeCount * typeDefSize && header.typeDefinitionsSize == typeCount * (typeDefSize + 4))
+            {
+                HGExtra = true;
+                Console.WriteLine($"Detected Hypergryph typeDefinition layout ({typeDefSize + 4} bytes)");
+            }
             typeDefs = ReadMetadataClassArray<Il2CppTypeDefinition>(header.typeDefinitionsOffset, header.typeDefinitionsSize);
             methodDefs = ReadMetadataClassArray<Il2CppMethodDefinition>(header.methodsOffset, header.methodsSize);
             parameterDefs = ReadMetadataClassArray<Il2CppParameterDefinition>(header.parametersOffset, header.parametersSize);
@@ -258,6 +266,10 @@ namespace Il2CppDumper
             var size = 0;
             foreach (var i in type.GetFields())
             {
+                if (!HGExtra && Attribute.IsDefined(i, typeof(HGExtraAttribute)))
+                {
+                    continue;
+                }
                 var attr = (VersionAttribute)Attribute.GetCustomAttribute(i, typeof(VersionAttribute));
                 if (attr != null)
                 {

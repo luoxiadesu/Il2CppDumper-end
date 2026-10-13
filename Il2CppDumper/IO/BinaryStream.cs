@@ -12,6 +12,7 @@ namespace Il2CppDumper
         public double Version;
         public bool Is32Bit;
         public ulong ImageBase;
+        public bool HGExtra;
         private readonly Stream stream;
         private readonly BinaryReader reader;
         private readonly BinaryWriter writer;
@@ -124,6 +125,10 @@ namespace Il2CppDumper
                 var t = new T();
                 foreach (var i in t.GetType().GetFields())
                 {
+                    if (!HGExtra && Attribute.IsDefined(i, typeof(HGExtraAttribute)))
+                    {
+                        continue;
+                    }
                     if (!attributeCache.TryGetValue(i, out var versionAttributes))
                     {
                         if (Attribute.IsDefined(i, typeof(VersionAttribute)))

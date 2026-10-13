@@ -17,5 +17,7 @@
         public double ForceVersion { get; set; } = 24.3;
         public bool ForceDump { get; set; } = false;
         public bool NoRedirectedPointer { get; set; } = false;
+        // PELoader calls LoadLibrary on the target, which runs its DllMain/TLS callbacks
+        public bool AllowPELoader { get; set; } = false;
     }
 }
